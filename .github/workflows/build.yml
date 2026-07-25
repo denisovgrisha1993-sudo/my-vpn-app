@@ -3,30 +3,37 @@ name: Build Android APK
 on:
   push:
     branches: [ "main" ]
-  workflow_dispatch: # Эта строчка позволит нам запускать сборку вручную одной кнопкой
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '11'
+          java-version: '17'
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
 
-      # Я пока закомментировал шаги сборки, чтобы конвейер не выдал ошибку из-за пустого репозитория
-      # Позже мы раскомментируем их!
-      # - run: flutter pub get
-      # - run: flutter build apk --release
-      
-      - name: Test Build Server
-        run: echo "Сборочный конвейер для VR готов к работе!"
+      - name: Generate Android System Files
+        run: flutter create --platforms android .
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Release APK
+        run: flutter build apk --release
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: quest-vpn-release
+          path: build/app/outputs/flutter-apk/app-release.apk
