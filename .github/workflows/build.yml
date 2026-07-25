@@ -22,10 +22,15 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          cache: true
 
-      - name: Get dependencies
-        run: flutter pub get
+      - name: Create Android Project
+        run: flutter create --platforms=android .
 
       - name: Build APK
-        run: flutter build apk --release --no-pub
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: quest-vpn-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
